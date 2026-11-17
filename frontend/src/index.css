@@ -1,0 +1,176 @@
+
+@import "tailwindcss";
+
+/* ==========================================
+   BONDLAB — INSTITUTIONAL DESIGN SYSTEM
+   ========================================== */
+
+:root {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  --radius-card: 10px;
+  --radius-control: 6px;
+}
+
+/* DARK THEME */
+
+:root,
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg-primary: #080b10;
+  --bg-secondary: #0d121a;
+  --bg-surface: #111720;
+  --bg-elevated: #171f2b;
+  --bg-hover: #1d2735;
+
+  --text-primary: #f1f5f9;
+  --text-secondary: #a1adbd;
+  --text-muted: #8290a3;
+
+  --border-primary: #252d39;
+  --border-secondary: #1b2430;
+
+  --accent: #3b82f6;
+  --accent-hover: #2563eb;
+  --accent-soft: #172b49;
+
+  --success: #22a06b;
+  --success-soft: #122e25;
+  --danger: #e05252;
+  --danger-soft: #351b20;
+  --warning: #d6a34b;
+
+  --chart-grid: #252d39;
+  --chart-text: #8290a3;
+}
+
+/* LIGHT THEME */
+
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  --bg-primary: #f3f5f8;
+  --bg-secondary: #ffffff;
+  --bg-surface: #ffffff;
+  --bg-elevated: #f8fafc;
+  --bg-hover: #edf1f6;
+
+  --text-primary: #172338;
+  --text-secondary: #52647d;
+  --text-muted: #8290a5;
+
+  --border-primary: #dce3ed;
+  --border-secondary: #e9edf3;
+
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+  --accent-soft: #eaf1ff;
+
+  --success: #168653;
+  --success-soft: #e6f5ed;
+  --danger: #dc3838;
+  --danger-soft: #fff0f0;
+  --warning: #b7791f;
+
+  --chart-grid: #dce3ed;
+  --chart-text: #64748b;
+}
+
+/* GLOBAL BASE */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  background: var(--bg-primary);
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+#root {
+  min-height: 100vh;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+::selection {
+  background: var(--accent);
+  color: #ffffff;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* INSTANT THEME SWITCH FOR FORM CONTROLS */
+
+input,
+select,
+textarea,
+option,
+button {
+  transition: none !important;
+  animation: none !important;
+}
+
+/* SCROLLBARS */
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-primary) var(--bg-primary);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-primary);
+  border-radius: 8px;
+}
+
+/* REDUCED MOTION */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}

@@ -8,7 +8,6 @@ import {
   Cell,
   ReferenceLine,
   ResponsiveContainer,
-  Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
@@ -84,6 +83,9 @@ export default function Analytics() {
   const [portfolioId, setPortfolioId] = useState<number | "">("");
   const [curveId, setCurveId] = useState<number | "">("");
   const [date, setDate] = useState("");
+  const [activeScenarioIndex, setActiveScenarioIndex] = useState<number | null>(
+    null
+  );
 
   const run = useMutation({
     mutationFn: async () => {
@@ -94,6 +96,7 @@ export default function Analytics() {
 
       return { metrics, scenarios };
     },
+    onSuccess: () => setActiveScenarioIndex(null),
   });
 
   const m = run.data?.metrics;
@@ -102,6 +105,17 @@ export default function Analytics() {
   const loadError = portfolios.error ?? curves.error;
   const isLoading = portfolios.isLoading || curves.isLoading;
   const isFetching = portfolios.isFetching || curves.isFetching;
+
+  const chartData =
+    s?.map((r) => ({
+      ...r,
+      label: `${r.shockBasisPoints > 0 ? "+" : ""}${r.shockBasisPoints} bp`,
+    })) ?? [];
+
+  const selectedScenario =
+    activeScenarioIndex !== null
+      ? s?.[activeScenarioIndex]
+      : undefined;
 
   const retryConnection = () => {
     void portfolios.refetch();
@@ -333,20 +347,53 @@ export default function Analytics() {
           {/* RATE SHOCK ANALYSIS */}
 
           <section className={panel}>
-            <SectionHeading
-              eyebrow="03 / Risk analysis"
-              title="Interest-rate shock scenarios"
-              description="Estimated percentage change in portfolio value under parallel yield-curve shocks."
-            />
+            <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
+              <div>
+                <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--accent)]">
+                  03 / Risk analysis
+                </div>
+                <h2 className="mt-1 text-lg font-semibold text-[var(--text-primary)]">
+                  Interest-rate shock scenarios
+                </h2>
+                <p className="mt-1 text-sm text-[var(--text-muted)]">
+                  Estimated percentage change in portfolio value under parallel
+                  yield-curve shocks.
+                </p>
+              </div>
+
+              {/* TOP-RIGHT HOVER READOUT */}
+
+              {selectedScenario && (
+                <div className="min-w-[110px] text-right">
+                  <div className="text-xs font-medium text-[var(--text-muted)]">
+                    {selectedScenario.shockBasisPoints > 0 ? "+" : ""}
+                    {selectedScenario.shockBasisPoints} bp
+                  </div>
+
+                  <div
+                    className={`mt-1 text-xl font-semibold tracking-tight tabular-nums ${
+                      selectedScenario.valueChangePercent >= 0
+                        ? "text-[var(--success)]"
+                        : "text-[var(--danger)]"
+                    }`}
+                  >
+                    {selectedScenario.valueChangePercent > 0 ? "+" : ""}
+                    {selectedScenario.valueChangePercent.toFixed(2)}%
+                  </div>
+
+                  <div className="text-[10px] text-[var(--text-muted)]">
+                    Value change
+                  </div>
+                </div>
+              )}
+            </div>
 
             <div className="h-72 w-full sm:h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart
-                  data={s.map((r) => ({
-                    ...r,
-                    label: `${r.shockBasisPoints > 0 ? "+" : ""}${r.shockBasisPoints} bp`,
-                  }))}
+                  data={chartData}
                   margin={{ left: 8, right: 16, top: 12, bottom: 4 }}
+                  onMouseLeave={() => setActiveScenarioIndex(null)}
                 >
                   <CartesianGrid
                     stroke="var(--chart-grid)"
@@ -362,22 +409,10 @@ export default function Analytics() {
                   />
 
                   <YAxis
-                    tickFormatter={(v) => `${v}%`}
+                    tickFormatter={(v: number) => `${v}%`}
                     tick={{ fill: "var(--chart-text)", fontSize: 11 }}
                     axisLine={false}
                     tickLine={false}
-                  />
-
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "var(--bg-elevated)",
-                      border: "1px solid var(--border-primary)",
-                      borderRadius: "8px",
-                      color: "var(--text-primary)",
-                      fontSize: "12px",
-                    }}
-                    labelStyle={{ color: "var(--text-secondary)" }}
-                    formatter={(v) => `${Number(v).toFixed(2)}%`}
                   />
 
                   <ReferenceLine
@@ -386,7 +421,18 @@ export default function Analytics() {
                     strokeDasharray="3 3"
                   />
 
-                  <Bar dataKey="valueChangePercent" name="Value change" radius={[4, 4, 0, 0]}>
+                  <Bar
+                    dataKey="valueChangePercent"
+                    name="Value change"
+                    radius={[4, 4, 0, 0]}
+                    activeBar={{
+                      stroke: "var(--text-primary)",
+                      strokeWidth: 1,
+                    }}
+                    onMouseEnter={(_, index) =>
+                      setActiveScenarioIndex(index)
+                    }
+                  >
                     {s.map((r) => (
                       <Cell
                         key={r.shockBasisPoints}
